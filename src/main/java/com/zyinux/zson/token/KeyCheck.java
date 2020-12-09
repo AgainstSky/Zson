@@ -1,5 +1,7 @@
 package com.zyinux.zson.token;
 
+import com.zyinux.zson.CharKey;
+
 /**
  * KeyCheck
  *
@@ -20,5 +22,9 @@ public class KeyCheck {
             return true;
         }
         return false;
+    }
+
+    public static boolean isEscape(char next) {
+        return next == CharKey.KEY_ESCAPE;
     }
 }
