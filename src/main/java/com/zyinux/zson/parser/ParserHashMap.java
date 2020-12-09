@@ -64,6 +64,7 @@ public class ParserHashMap {
                     break;
                 case CharKey.KEY_SEP_COLON:
                     queue.add(new TokenType(Token.TOKEN_SEP_COLON));
+                    queue.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
                     break;
                 case CharKey.KEY_KEY:
                     queue.add(new TokenType(Token.TOKEN_STRING, TokenHelper.findTheTokenStringData(jsonReader)));

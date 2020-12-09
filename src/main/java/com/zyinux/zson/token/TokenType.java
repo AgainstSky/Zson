@@ -21,4 +21,12 @@ public class TokenType {
     public TokenType(Token token) {
         this.token = token;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "" + token +
+                ":" + data +
+                '}';
+    }
 }

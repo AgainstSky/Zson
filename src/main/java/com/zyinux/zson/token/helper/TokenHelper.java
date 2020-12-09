@@ -4,6 +4,7 @@ import com.zyinux.zson.CharKey;
 import com.zyinux.zson.exception.ZsonException;
 import com.zyinux.zson.reader.JsonReader;
 import com.zyinux.zson.token.KeyCheck;
+import com.zyinux.zson.token.TokenType;
 
 /**
  * TokenHelper
@@ -23,6 +24,8 @@ public class TokenHelper {
     public static String findTheTokenStringData(JsonReader jsonReader) {
         StringBuffer sb = new StringBuffer();
         char next = ' ';
+
+        //一直读取到文件末尾或者读到下一个CharKey.KEY_KEY
         while (jsonReader.hasNext() && (next = jsonReader.next()) != CharKey.KEY_KEY) {
             sb.append(next);
             //这里需要考虑转义字符的问题，其他字符应该没有太过需要处理的，但是当下一个字符是' " '也就是CharKey.KEY_KEY的时候需要特别处理
@@ -41,5 +44,23 @@ public class TokenHelper {
             throw new ZsonException("解析错误，在第"+jsonReader.position()+"处预期有一个'"+CharKey.KEY_KEY+"'，但是不存在");
         }
         return sb.toString();
+    }
+
+    /**
+     * 获取下一个 token 类型，基本是在遇到{@link com.zyinux.zson.token.Token.TOKEN_SEP_COLON}之后调用
+     * 所以大概率是 k:v 中的value
+     * @param jsonReader
+     * @return
+     */
+    public static TokenType getTheTokenMaybeValue(JsonReader jsonReader) {
+        if (!jsonReader.hasNext()){
+            throw new ZsonException("解析错误，在第"+jsonReader.position()+"处预期不能结尾，但是json结束了");
+        }
+
+        while (jsonReader.hasNext()){
+            char next = jsonReader.next();
+
+        }
+        return null;
     }
 }

@@ -22,7 +22,9 @@ public enum Token {
     TOKEN_SEP_COMMA(CharKey.KEY_SEP_COMMA),
     TOKEN_STRING,
     TOKEN_NUMBER,
-    TOKEN_BOOL;
+    TOKEN_BOOL,
+    TOKEN_OBJECT,
+    TOKEN_ARRAY;
 
     /**
      * token对应的具体的字符串(如果有)

@@ -1,5 +1,7 @@
 package com.zyinux.zson.reader;
 
+import com.zyinux.zson.exception.ZsonException;
+
 /**
  * Reader
  *
@@ -14,8 +16,9 @@ public interface JsonReader {
     /**
      * 不关心具体的实现，只要能返回下一个字符就行了。
      * @return next char
+     * @throws ZsonException
      */
-    char next();
+    char next() throws ZsonException;
 
     /**
      * 返回总的字符长度

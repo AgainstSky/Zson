@@ -1,5 +1,7 @@
 package com.zyinux.zson.reader;
 
+import com.zyinux.zson.exception.ZsonException;
+
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -18,10 +20,11 @@ public class StringJsonReader extends AbstractJsonReader<StringReader> {
 
     }
 
-    public char next() {
+    @Override
+    public char next() throws ZsonException{
         try {
             if (pos>=length()) {
-                throw new IOException("读取到末尾");
+                throw new ZsonException("读取到末尾");
             }
             char read = (char) reader.read();
             pos++;
@@ -32,6 +35,7 @@ public class StringJsonReader extends AbstractJsonReader<StringReader> {
         return ' ';
     }
 
+    @Override
     public int length() {
         return jsonStr.length();
     }

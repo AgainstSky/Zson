@@ -19,10 +19,12 @@ public abstract class AbstractJsonReader<T> implements JsonReader {
         this.jsonStr = jsonStr;
     }
 
+    @Override
     public int position() {
         return pos;
     }
 
+    @Override
     public boolean hasNext() {
         if (pos<jsonStr.length()){
             return true;

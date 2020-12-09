@@ -11,13 +11,13 @@ import java.util.Map;
  */
 public class Main {
 
-    static String json="{\"robot\":\"fals\\\"\\\\\\\\e\"}";
+    static String json="{\"robot\":\"fals\\\"\\t\\ne\"}";
 
     public static void main(String[] args) {
         Zson zson=new Zson();
         Map<String, Object> stringObjectMap = zson.parserJson(json);
         assert stringObjectMap!=null;
         System.out.println(stringObjectMap);
-//        System.out.println(json);
+        System.out.println(json);
     }
 }
