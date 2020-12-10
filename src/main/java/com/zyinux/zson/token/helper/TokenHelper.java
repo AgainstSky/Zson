@@ -4,6 +4,7 @@ import com.zyinux.zson.CharKey;
 import com.zyinux.zson.exception.ZsonException;
 import com.zyinux.zson.reader.JsonReader;
 import com.zyinux.zson.token.KeyCheck;
+import com.zyinux.zson.token.Token;
 import com.zyinux.zson.token.TokenType;
 
 /**
@@ -15,13 +16,71 @@ import com.zyinux.zson.token.TokenType;
  */
 public class TokenHelper {
 
-
     /**
-     * 解析接下来的流，直到遇到下一个{@link CharKey.KEY_KEY}，中间所有的内容就是一个完整的TokenString
+     * 预期解析出一个json对象
+     *
      * @param jsonReader
      * @return
      */
-    public static String findTheTokenStringData(JsonReader jsonReader) {
+    public static TokenType parseForTokenObject(JsonReader jsonReader) {
+
+        TokenType tokenType = new TokenType(Token.TOKEN_OBJECT);
+        boolean findNextKey = false;
+        while (jsonReader.hasNext() && !findNextKey) {
+            char next = jsonReader.next();
+
+            if (KeyCheck.isContinueKey(next)) {
+                continue;
+            }
+
+            switch (next) {
+                case CharKey.KEY_OBJECT_BEGIN:
+                    tokenType.add(parseForTokenObject(jsonReader));
+                    break;
+                case CharKey.KEY_OBJECT_END:
+                    findNextKey = true;
+                    break;
+                case CharKey.KEY_ARRAY_BEGIN:
+                    tokenType.add(parseForTokenArray(jsonReader));
+                    break;
+                case CharKey.KEY_ARRAY_END:
+                    //理论上这个key应该在 parseForTokenArray 里被处理，不会在解析Object里出现
+                    //tokenType.add(new TokenType(Token.TOKEN_ARRAY_END));
+                    break;
+                case CharKey.KEY_ESCAPE:
+                    //理论上这个key应该在 findTheTokenStringData 里被处理，不会在解析Object里出现
+                    //tokenType.add(new TokenType(Token.TOKEN_ESCAPE));
+                    break;
+                case CharKey.KEY_SEP_COMMA:
+                    tokenType.add(new TokenType(Token.TOKEN_SEP_COMMA));
+                    break;
+                case CharKey.KEY_SEP_COLON:
+                    tokenType.add(new TokenType(Token.TOKEN_SEP_COLON));
+//                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
+                    break;
+                case CharKey.KEY_KEY:
+                    tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        return tokenType;
+    }
+
+    private static TokenType parseForTokenArray(JsonReader jsonReader) {
+        return null;
+    }
+
+    /**
+     * 解析接下来的流，直到遇到下一个{@link CharKey.KEY_KEY}，中间所有的内容就是一个完整的TokenString
+     *
+     * @param jsonReader
+     * @return
+     */
+    public static TokenType findTheTokenStringData(JsonReader jsonReader) {
         StringBuffer sb = new StringBuffer();
         char next = ' ';
 
@@ -31,9 +90,9 @@ public class TokenHelper {
             //这里需要考虑转义字符的问题，其他字符应该没有太过需要处理的，但是当下一个字符是' " '也就是CharKey.KEY_KEY的时候需要特别处理
             //转义字符正常情况下两个搭配在一起使用的，所以直接多拿下一个char存入sb里面。
             //当然如果下一个不存在了，则直接抛出异常
-            if (KeyCheck.isEscape(next)){
-                if (!jsonReader.hasNext()){
-                    throw new ZsonException("解析错误，在第"+jsonReader.position()+"处预期不能结尾，但是json结束了");
+            if (KeyCheck.isEscape(next)) {
+                if (!jsonReader.hasNext()) {
+                    throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期不能结尾，但是json结束了");
                 }
                 sb.append(jsonReader.next());
             }
@@ -41,23 +100,24 @@ public class TokenHelper {
         }
 
         if (next != CharKey.KEY_KEY) {
-            throw new ZsonException("解析错误，在第"+jsonReader.position()+"处预期有一个'"+CharKey.KEY_KEY+"'，但是不存在");
+            throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期有一个'" + CharKey.KEY_KEY + "'，但是不存在");
         }
-        return sb.toString();
+        return new TokenType(Token.TOKEN_STRING,sb.toString());
     }
 
     /**
      * 获取下一个 token 类型，基本是在遇到{@link com.zyinux.zson.token.Token.TOKEN_SEP_COLON}之后调用
      * 所以大概率是 k:v 中的value
+     *
      * @param jsonReader
      * @return
      */
     public static TokenType getTheTokenMaybeValue(JsonReader jsonReader) {
-        if (!jsonReader.hasNext()){
-            throw new ZsonException("解析错误，在第"+jsonReader.position()+"处预期不能结尾，但是json结束了");
+        if (!jsonReader.hasNext()) {
+            throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期不能结尾，但是json结束了");
         }
 
-        while (jsonReader.hasNext()){
+        while (jsonReader.hasNext()) {
             char next = jsonReader.next();
 
         }
