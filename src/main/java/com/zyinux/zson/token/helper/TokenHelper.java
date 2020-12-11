@@ -32,7 +32,6 @@ public class TokenHelper {
             if (KeyCheck.isContinueKey(next)) {
                 continue;
             }
-
             switch (next) {
                 case CharKey.KEY_OBJECT_BEGIN:
                     tokenType.add(parseForTokenObject(jsonReader));
@@ -56,7 +55,7 @@ public class TokenHelper {
                     break;
                 case CharKey.KEY_SEP_COLON:
                     tokenType.add(new TokenType(Token.TOKEN_SEP_COLON));
-//                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
+                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
                     break;
                 case CharKey.KEY_KEY:
                     tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
@@ -102,12 +101,13 @@ public class TokenHelper {
         if (next != CharKey.KEY_KEY) {
             throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期有一个'" + CharKey.KEY_KEY + "'，但是不存在");
         }
-        return new TokenType(Token.TOKEN_STRING,sb.toString());
+        return new TokenType(Token.TOKEN_STRING, sb.toString());
     }
 
     /**
      * 获取下一个 token 类型，基本是在遇到{@link com.zyinux.zson.token.Token.TOKEN_SEP_COLON}之后调用
      * 所以大概率是 k:v 中的value
+     * 但是也可能是下一个Object或者Array
      *
      * @param jsonReader
      * @return
@@ -119,8 +119,52 @@ public class TokenHelper {
 
         while (jsonReader.hasNext()) {
             char next = jsonReader.next();
+            if (KeyCheck.isContinueKey(next)) {
+                continue;
+            }
 
+            if (next == CharKey.KEY_OBJECT_BEGIN) {
+                return parseForTokenObject(jsonReader);
+            } else if (next == CharKey.KEY_ARRAY_BEGIN) {
+                return parseForTokenArray(jsonReader);
+            } else if (next == CharKey.KEY_KEY) {
+                return findTheTokenStringData(jsonReader);
+            } else if (next == 'f' || next == 't') {
+                return findTheTokenBooleanData(jsonReader,next);
+            } else if (next == '0') {
+                return findTheTokenNumberData(jsonReader);
+            } else {
+                throw new ZsonException("解析错误，" + jsonReader.position() + "存在未知无法解析的字符" + next);
+            }
         }
+        throw new ZsonException("解析错误，未知错误在:" + jsonReader.position());
+    }
+
+    private static TokenType findTheTokenNumberData(JsonReader jsonReader) {
+
         return null;
+    }
+
+    private static TokenType findTheTokenBooleanData(JsonReader jsonReader,char prev) {
+
+        StringBuilder sb=new StringBuilder();
+        sb.append(prev);
+        while (jsonReader.hasNext()) {
+            char next = jsonReader.next();
+            if (next==CharKey.KEY_SEP_COMMA||next==CharKey.KEY_ARRAY_END||next==CharKey.KEY_OBJECT_END){
+                break;
+            }
+            sb.append(next);
+        }
+        String value = sb.toString();
+        TokenType tokenType=new TokenType(Token.TOKEN_BOOL);
+        if ("false".equals(value)){
+            tokenType.setContent(false);
+        }else if ("true".equals(value)){
+            tokenType.setContent(true);
+        }else {
+            throw new ZsonException("解析错误，在"+jsonReader.position()+"处理应是一个boolean类型，然而是："+value);
+        }
+        return tokenType;
     }
 }

@@ -47,6 +47,7 @@ public class ParserHashMap {
 
     private TokenType parserJsonToTokenObject(String json) {
         JsonReader jsonReader = new StringJsonReader(json);
+        jsonReader.next();
         return TokenHelper.parseForTokenObject(jsonReader);
     }
 }

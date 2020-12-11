@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Main {
 
-    static String json="{\"robot\":\"false\"}";
+    static String json="{\"robot\":\"false\",\"object\":{\"name\":false}}";
 
     public static void main(String[] args) {
         Zson zson=new Zson();

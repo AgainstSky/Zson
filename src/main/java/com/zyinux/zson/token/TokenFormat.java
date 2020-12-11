@@ -17,20 +17,21 @@ public class TokenFormat {
      */
     public String formatForDebug(TokenType tokenType) {
         StringBuilder sb = new StringBuilder();
-        sb.append("{\n");
-        if (isObjectStyleToken(tokenType)){
+        if (isObjectStyleToken(tokenType)) {
+            sb.append("{\n");
             for (TokenType type : tokenType.getChildToken()) {
                 sb.append(formatForDebug(type));
             }
-        }else {
-            if (tokenType.getContent()==null){
+            sb.append("}\n");
+        } else {
+            if (tokenType.getContent() == null) {
                 sb.append(tokenType.getToken().getKey()).append("\n");
-            }else {
-                sb.append(tokenType.getContent()).append("\n");
+            } else {
+                sb.append(tokenType.getToken()).append("@ ").append(tokenType.getContent()).append("\n");
             }
 
         }
-        sb.append("}\n");
+
         return sb.toString();
     }
 
