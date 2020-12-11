@@ -130,7 +130,7 @@ public class TokenHelper {
             } else if (next == CharKey.KEY_KEY) {
                 return findTheTokenStringData(jsonReader);
             } else if (next == 'f' || next == 't') {
-                return findTheTokenBooleanData(jsonReader,next);
+                return findTheTokenBooleanData(jsonReader, next);
             } else if (next == '0') {
                 return findTheTokenNumberData(jsonReader);
             } else {
@@ -145,25 +145,25 @@ public class TokenHelper {
         return null;
     }
 
-    private static TokenType findTheTokenBooleanData(JsonReader jsonReader,char prev) {
+    private static TokenType findTheTokenBooleanData(JsonReader jsonReader, char prev) {
 
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(prev);
         while (jsonReader.hasNext()) {
             char next = jsonReader.next();
-            if (next==CharKey.KEY_SEP_COMMA||next==CharKey.KEY_ARRAY_END||next==CharKey.KEY_OBJECT_END){
+            if (KeyCheck.isValueEndKey(next)) {
                 break;
             }
             sb.append(next);
         }
-        String value = sb.toString();
-        TokenType tokenType=new TokenType(Token.TOKEN_BOOL);
-        if ("false".equals(value)){
+        String value = sb.toString().trim();
+        TokenType tokenType = new TokenType(Token.TOKEN_BOOL);
+        if (KeyCheck.isFalseKey(value)) {
             tokenType.setContent(false);
-        }else if ("true".equals(value)){
+        } else if (KeyCheck.isTrueKey(value)) {
             tokenType.setContent(true);
-        }else {
-            throw new ZsonException("解析错误，在"+jsonReader.position()+"处理应是一个boolean类型，然而是："+value);
+        } else {
+            throw new ZsonException("解析错误，在" + jsonReader.position() + "处理应是一个boolean类型，然而是：" + value);
         }
         return tokenType;
     }

@@ -27,4 +27,26 @@ public class KeyCheck {
     public static boolean isEscape(char next) {
         return next == CharKey.KEY_ESCAPE;
     }
+
+    public static boolean isValueEndKey(char next) {
+        return next==CharKey.KEY_SEP_COMMA||next==CharKey.KEY_ARRAY_END||next==CharKey.KEY_OBJECT_END;
+    }
+
+    /**
+     * 是不是一个boolean类型的false
+     * @param value
+     * @return
+     */
+    public static boolean isFalseKey(String value) {
+        return "false".equals(value);
+    }
+
+    /**
+     * 是不是一个boolean类型的true
+     * @param value
+     * @return
+     */
+    public static boolean isTrueKey(String value) {
+        return "true".equals(value);
+    }
 }
