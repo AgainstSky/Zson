@@ -14,6 +14,10 @@ import java.io.StringReader;
  */
 public class StringJsonReader extends AbstractJsonReader<StringReader> {
 
+    private char backCache;
+
+    private volatile boolean isBack;
+
     public StringJsonReader(String jsonStr) {
         super(jsonStr);
         reader = new StringReader(jsonStr);
@@ -21,13 +25,19 @@ public class StringJsonReader extends AbstractJsonReader<StringReader> {
     }
 
     @Override
-    public char next() throws ZsonException{
+    public char next() throws ZsonException {
+        if (isBack) {
+            pos++;
+            isBack = false;
+            return backCache;
+        }
         try {
-            if (pos>=length()) {
+            if (pos >= length()) {
                 throw new ZsonException("读取到末尾");
             }
             char read = (char) reader.read();
             pos++;
+            backCache = read;
             return read;
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,5 +48,14 @@ public class StringJsonReader extends AbstractJsonReader<StringReader> {
     @Override
     public int length() {
         return jsonStr.length();
+    }
+
+    @Override
+    public void backOne() {
+        if (pos == 0) {
+            throw new ZsonException("回退字符失败，当前为第一位无法回退");
+        }
+        pos--;
+        isBack = true;
     }
 }

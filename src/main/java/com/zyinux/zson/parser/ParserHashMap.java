@@ -1,6 +1,7 @@
 package com.zyinux.zson.parser;
 
 import com.zyinux.zson.CharKey;
+import com.zyinux.zson.exception.ZsonException;
 import com.zyinux.zson.reader.JsonReader;
 import com.zyinux.zson.reader.StringJsonReader;
 import com.zyinux.zson.token.KeyCheck;
@@ -48,6 +49,13 @@ public class ParserHashMap {
     private TokenType parserJsonToTokenObject(String json) {
         JsonReader jsonReader = new StringJsonReader(json);
         jsonReader.next();
-        return TokenHelper.parseForTokenObject(jsonReader);
+        TokenType tokenType = TokenHelper.parseForTokenObject(jsonReader);
+
+        while (jsonReader.hasNext()){
+            if (!KeyCheck.isSpaceKey(jsonReader.next())){
+                throw new ZsonException("解析错误，在解析完成之后还存在未知字符.");
+            }
+        }
+        return tokenType;
     }
 }

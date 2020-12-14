@@ -28,6 +28,11 @@ public class KeyCheck {
         return next == CharKey.KEY_ESCAPE;
     }
 
+    /**
+     * 一个值的结尾符号，正确的情况下，只有  , ]  }  来结束，不应该存在其他值
+     * @param next
+     * @return
+     */
     public static boolean isValueEndKey(char next) {
         return next==CharKey.KEY_SEP_COMMA||next==CharKey.KEY_ARRAY_END||next==CharKey.KEY_OBJECT_END;
     }
@@ -48,5 +53,9 @@ public class KeyCheck {
      */
     public static boolean isTrueKey(String value) {
         return "true".equals(value);
+    }
+
+    public static boolean isSpaceKey(char next) {
+        return next == CharKey.KEY_SPACE;
     }
 }

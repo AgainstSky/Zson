@@ -65,7 +65,9 @@ public class TokenHelper {
             }
 
         }
-
+        if (!findNextKey){
+            throw new ZsonException("解析错误，直到结束所有流，也没有遇到预期的 ` } ` 来结束这个json对象 ");
+        }
         return tokenType;
     }
 
@@ -131,18 +133,34 @@ public class TokenHelper {
                 return findTheTokenStringData(jsonReader);
             } else if (next == 'f' || next == 't') {
                 return findTheTokenBooleanData(jsonReader, next);
-            } else if (next == '0') {
-                return findTheTokenNumberData(jsonReader);
+            } else if (Character.isDigit(next) || next == '+' || next == '-') {
+                //当字符是数字的情况下的解析
+                return findTheTokenNumberData(jsonReader, next);
             } else {
-                throw new ZsonException("解析错误，" + jsonReader.position() + "存在未知无法解析的字符" + next);
+                throw new ZsonException("解析错误，" + jsonReader.position() + "存在未知无法解析的字符： ` " + next+" `");
             }
         }
         throw new ZsonException("解析错误，未知错误在:" + jsonReader.position());
     }
 
-    private static TokenType findTheTokenNumberData(JsonReader jsonReader) {
-
-        return null;
+    private static TokenType findTheTokenNumberData(JsonReader jsonReader, char prev) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prev);
+        while (jsonReader.hasNext()) {
+            char next = jsonReader.next();
+            if (KeyCheck.isValueEndKey(next)) {
+                break;
+            }
+//            if (!Character.isDigit(next)){
+//
+//            }
+            sb.append(next);
+        }
+        String value = sb.toString().trim();
+        TokenType tokenType = new TokenType(Token.TOKEN_NUMBER);
+        tokenType.setContent(value);
+        jsonReader.backOne();
+        return tokenType;
     }
 
     private static TokenType findTheTokenBooleanData(JsonReader jsonReader, char prev) {
@@ -165,6 +183,9 @@ public class TokenHelper {
         } else {
             throw new ZsonException("解析错误，在" + jsonReader.position() + "处理应是一个boolean类型，然而是：" + value);
         }
+
+        // 回退一位
+        jsonReader.backOne();
         return tokenType;
     }
 }

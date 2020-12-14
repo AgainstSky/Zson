@@ -25,4 +25,6 @@ public class CharKey {
 
     public static final char KEY_SEP_COMMA=',';
 
+    public static final char KEY_SPACE=' ';
+
 }

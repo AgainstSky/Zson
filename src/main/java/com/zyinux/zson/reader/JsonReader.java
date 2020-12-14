@@ -37,4 +37,9 @@ public interface JsonReader {
      * @return
      */
     boolean hasNext();
+
+    /**
+     * 回退一个字符。某些时候需要用到
+     */
+    void backOne();
 }
