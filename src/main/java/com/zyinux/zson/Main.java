@@ -11,10 +11,25 @@ import java.util.Map;
  */
 public class Main {
 
-    static String json="{\"Title\":\"订单信息模板\",\"Content\":{\"orderId\":\"DB202012075929933433\",\"bizofferName\":\"大M无Kefu测试2020-12-06-001\",\"gameName\":\"天涯明月刀\",\"gameAreaName\":\"青龙乱舞\",\"gameServerName\":true,\"bizofferTypeName\":\"游戏帐号\",\"payPrice\":1050,\"orderStatus\":\"交易成功\"},\"ClassName\":\"fsOrderInfo\"}";
+    static String json="{\n" +
+            "    \"ResultCode\": 200,\n" +
+            "    \"Message\": \"\",\n" +
+            "    \"CharSet\": \"utf-8\",\n" +
+            "    \"Data\": {\n" +
+            "        \"SellerReasonCnfs\": [\n" +
+            "            \"其它\",\n" +
+            "false,\n" +
+            "123.453,\n" +
+            "{\n" +
+            "\"test\":\"hehe\"\n" +
+            "},[123,123]\n" +
+            "        ]\n" +
+            "    }\n" +
+            "}";
 
     public static void main(String[] args) {
         Zson zson=new Zson();
+
         Map<String, Object> stringObjectMap = zson.parserJson(json);
 
 

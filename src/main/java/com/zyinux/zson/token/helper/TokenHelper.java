@@ -71,8 +71,59 @@ public class TokenHelper {
         return tokenType;
     }
 
+    /**
+     * 解析一些数组的token
+     * @param jsonReader
+     * @return
+     */
     private static TokenType parseForTokenArray(JsonReader jsonReader) {
-        return null;
+        TokenType tokenType = new TokenType(Token.TOKEN_ARRAY);
+        boolean findNextKey = false;
+        while (jsonReader.hasNext() && !findNextKey) {
+            char next = jsonReader.next();
+
+            if (KeyCheck.isContinueKey(next)) {
+                continue;
+            }
+            switch (next) {
+                case CharKey.KEY_OBJECT_BEGIN:
+                    tokenType.add(parseForTokenObject(jsonReader));
+                    break;
+                case CharKey.KEY_OBJECT_END:
+
+                    break;
+                case CharKey.KEY_ARRAY_BEGIN:
+                    tokenType.add(parseForTokenArray(jsonReader));
+                    break;
+                case CharKey.KEY_ARRAY_END:
+                    findNextKey = true;
+                    break;
+                case CharKey.KEY_ESCAPE:
+                    //理论上这个key应该在 findTheTokenStringData 里被处理，不会在解析Object里出现
+                    //tokenType.add(new TokenType(Token.TOKEN_ESCAPE));
+                    break;
+                case CharKey.KEY_SEP_COMMA:
+                    tokenType.add(new TokenType(Token.TOKEN_SEP_COMMA));
+                    tokenType.add(getTheTokenMaybeValue(jsonReader));
+                    break;
+                case CharKey.KEY_SEP_COLON:
+                    //理论上来说数组里面无论如何都不能存在这个key，这个只能被包括在内部的object里，所以应该抛出异常
+                    throw new ZsonException("解析错误，在Json数组里:"+jsonReader.position()+"处不应该存在  ` : ` ");
+//                    tokenType.add(new TokenType(Token.TOKEN_SEP_COLON));
+//                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
+//                    break;
+                case CharKey.KEY_KEY:
+                    tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        if (!findNextKey){
+            throw new ZsonException("解析错误，直到结束所有流，也没有遇到预期的 ` ] ` 来结束这个json对象 ");
+        }
+        return tokenType;
     }
 
     /**

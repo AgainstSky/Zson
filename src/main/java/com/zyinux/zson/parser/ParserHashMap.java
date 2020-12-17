@@ -29,8 +29,7 @@ public class ParserHashMap {
     public Map<String, Object> parser(String json) {
 
         TokenTypeParser parser=new TokenTypeParser();
-//        Queue<TokenType> queue = parserJsonToTokenTypeList(json);
-//        System.out.println(queue);
+
 
         TokenType tokenType = parserJsonToTokenObject(json);
         System.out.println(new TokenFormat().format(tokenType));

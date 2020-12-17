@@ -12,7 +12,7 @@ import com.zyinux.zson.CharKey;
 public class TokenFormat {
 
     //每一层用两个空格分隔开
-    public final static String SPACE_KEY = "  ";
+    public final static String SPACE_KEY = "**";
 
     /**
      * 测试情况下的输出辅助，方便看清楚数据，不是正常情况下的格式化json
@@ -54,12 +54,13 @@ public class TokenFormat {
     private String formatTokenObject(TokenType tokenObject, String placeholder, int deep) {
         StringBuilder sb = new StringBuilder();
 
-
         String childPlaceholder = buildChildDeepSpace(placeholder);
 
-        sb.append("\n").append(placeholder);
-
-        sb.append(CharKey.KEY_OBJECT_BEGIN).append("\n").append(childPlaceholder);
+        sb.append("\n")
+                .append(placeholder)
+                .append(CharKey.KEY_OBJECT_BEGIN)
+                .append("\n")
+                .append(childPlaceholder);
 
         if (tokenObject.getChildToken() != null) {
             for (TokenType child : tokenObject.getChildToken()) {
@@ -77,6 +78,7 @@ public class TokenFormat {
                         sb.append(child.getContent());
                         break;
                     case TOKEN_ARRAY:
+                        sb.append(formatTokenArray(child, childPlaceholder.concat(SPACE_KEY), deep + 1));
                         break;
                     case TOKEN_NUMBER:
                         sb.append(child.getContent());
@@ -89,11 +91,50 @@ public class TokenFormat {
                 }
             }
         }
-        sb.append("\n");
+        sb.append("\n").append(placeholder).append(CharKey.KEY_OBJECT_END);
+        return sb.toString();
+    }
 
-        sb.append(placeholder);
+    private String formatTokenArray(TokenType tokenObject, String placeholder, int deep) {
+        StringBuilder sb = new StringBuilder();
 
-        sb.append(CharKey.KEY_OBJECT_END);
+        String childPlaceholder = buildChildDeepSpace(placeholder);
+
+        sb
+                .append(CharKey.KEY_ARRAY_BEGIN)
+                .append("\n")
+                .append(childPlaceholder);
+
+        if (tokenObject.getChildToken() != null) {
+            for (TokenType child : tokenObject.getChildToken()) {
+                switch (child.getToken()) {
+                    case TOKEN_STRING:
+                        sb.append(CharKey.KEY_KEY).append(child.getContent()).append(CharKey.KEY_KEY);
+                        break;
+                    case TOKEN_SEP_COLON:
+                        sb.append(" ").append(CharKey.KEY_SEP_COLON).append(" ");
+                        break;
+                    case TOKEN_SEP_COMMA:
+                        sb.append(CharKey.KEY_SEP_COMMA).append("\n").append(childPlaceholder);
+                        break;
+                    case TOKEN_BOOL:
+                        sb.append(child.getContent());
+                        break;
+                    case TOKEN_ARRAY:
+                        sb.append(formatTokenArray(child, childPlaceholder.concat(SPACE_KEY), deep + 1));
+                        break;
+                    case TOKEN_NUMBER:
+                        sb.append(child.getContent());
+                        break;
+                    case TOKEN_OBJECT:
+                        sb.append(formatTokenObject(child, childPlaceholder, deep + 1));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        sb.append("\n").append(placeholder, 0, placeholder.length()-2).append(CharKey.KEY_ARRAY_END);
         return sb.toString();
     }
 

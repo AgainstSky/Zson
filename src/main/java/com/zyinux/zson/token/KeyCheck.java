@@ -18,7 +18,7 @@ public class KeyCheck {
      * @return
      */
     public static boolean isContinueKey(char next) {
-        if (next == ' ' || next == '\t') {
+        if (next == ' ' || next == '\t' || next == '\n') {
             return true;
         }
         return false;
