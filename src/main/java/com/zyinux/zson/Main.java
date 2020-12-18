@@ -13,7 +13,7 @@ public class Main {
 
     static String json="{\n" +
             "    \"ResultCode\": 200,\n" +
-            "    \"Message\": \"\",\n" +
+            "    \"Message\": null,\n" +
             "    \"CharSet\": \"utf-8\",\n" +
             "    \"Data\": {\n" +
             "        \"SellerReasonCnfs\": [\n" +

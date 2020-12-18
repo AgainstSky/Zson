@@ -79,6 +79,7 @@ public class TokenHelper {
     private static TokenType parseForTokenArray(JsonReader jsonReader) {
         TokenType tokenType = new TokenType(Token.TOKEN_ARRAY);
         boolean findNextKey = false;
+
         while (jsonReader.hasNext() && !findNextKey) {
             char next = jsonReader.next();
 
@@ -90,7 +91,6 @@ public class TokenHelper {
                     tokenType.add(parseForTokenObject(jsonReader));
                     break;
                 case CharKey.KEY_OBJECT_END:
-
                     break;
                 case CharKey.KEY_ARRAY_BEGIN:
                     tokenType.add(parseForTokenArray(jsonReader));
@@ -116,6 +116,8 @@ public class TokenHelper {
                     tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
                     break;
                 default:
+                    jsonReader.backOne();
+                    tokenType.add(getTheTokenMaybeValue(jsonReader));
                     break;
             }
 
@@ -180,18 +182,51 @@ public class TokenHelper {
                 return parseForTokenObject(jsonReader);
             } else if (next == CharKey.KEY_ARRAY_BEGIN) {
                 return parseForTokenArray(jsonReader);
-            } else if (next == CharKey.KEY_KEY) {
+            } else if (next == CharKey.KEY_ARRAY_END){
+                return new TokenType(Token.TOKEN_ARRAY_END);
+            }if (next == CharKey.KEY_KEY) {
                 return findTheTokenStringData(jsonReader);
             } else if (next == 'f' || next == 't') {
                 return findTheTokenBooleanData(jsonReader, next);
             } else if (Character.isDigit(next) || next == '+' || next == '-') {
                 //当字符是数字的情况下的解析
                 return findTheTokenNumberData(jsonReader, next);
-            } else {
+            } else if (next == 'n'){
+                return findTheTokenNullData(jsonReader,next);
+            }else {
                 throw new ZsonException("解析错误，" + jsonReader.position() + "存在未知无法解析的字符： ` " + next+" `");
             }
         }
         throw new ZsonException("解析错误，未知错误在:" + jsonReader.position());
+    }
+
+    /**
+     * 解析空值对象
+     * @param jsonReader
+     * @param prev
+     * @return
+     */
+    private static TokenType findTheTokenNullData(JsonReader jsonReader, char prev) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prev);
+        while (jsonReader.hasNext()) {
+            char next = jsonReader.next();
+            if (KeyCheck.isValueEndKey(next)) {
+                break;
+            }
+            sb.append(next);
+        }
+        String value = sb.toString().trim();
+        TokenType tokenType = new TokenType(Token.TOKEN_NULL);
+        if (KeyCheck.isNullKey(value)) {
+            tokenType.setContent("null");
+        } else {
+            throw new ZsonException("解析错误，在" + jsonReader.position() + "处理应是一个 null ，然而是：" + value);
+        }
+
+        // 回退一位
+        jsonReader.backOne();
+        return tokenType;
     }
 
     private static TokenType findTheTokenNumberData(JsonReader jsonReader, char prev) {

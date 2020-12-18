@@ -24,6 +24,7 @@ public enum Token {
     TOKEN_NUMBER,
     TOKEN_BOOL,
     TOKEN_OBJECT,
+    TOKEN_NULL,
     TOKEN_ARRAY;
 
     /**

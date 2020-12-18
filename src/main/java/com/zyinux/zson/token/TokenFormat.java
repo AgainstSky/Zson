@@ -41,7 +41,7 @@ public class TokenFormat {
     }
 
     public String format(TokenType tokenType) {
-        return formatTokenObject(tokenType, "", 0);
+        return formatTokenObject(tokenType, "", 0, false);
     }
 
     /**
@@ -51,16 +51,19 @@ public class TokenFormat {
      * @param deep        当前解析的对象深度
      * @return
      */
-    private String formatTokenObject(TokenType tokenObject, String placeholder, int deep) {
+    private String formatTokenObject(TokenType tokenObject, String placeholder, int deep, boolean needBreak) {
         StringBuilder sb = new StringBuilder();
 
         String childPlaceholder = buildChildDeepSpace(placeholder);
 
-        sb.append("\n")
-                .append(placeholder)
+        if (needBreak) {
+            sb.append("\n").append(placeholder);
+        }
+
+        sb
                 .append(CharKey.KEY_OBJECT_BEGIN)
                 .append("\n")
-                .append(childPlaceholder);
+                .append(placeholder);
 
         if (tokenObject.getChildToken() != null) {
             for (TokenType child : tokenObject.getChildToken()) {
@@ -77,6 +80,9 @@ public class TokenFormat {
                     case TOKEN_BOOL:
                         sb.append(child.getContent());
                         break;
+                    case TOKEN_NULL:
+                        sb.append("null");
+                        break;
                     case TOKEN_ARRAY:
                         sb.append(formatTokenArray(child, childPlaceholder.concat(SPACE_KEY), deep + 1));
                         break;
@@ -84,14 +90,20 @@ public class TokenFormat {
                         sb.append(child.getContent());
                         break;
                     case TOKEN_OBJECT:
-                        sb.append(formatTokenObject(child, childPlaceholder.concat(SPACE_KEY), deep + 1));
+                        sb.append(formatTokenObject(child, childPlaceholder.concat(SPACE_KEY), deep + 1, false));
                         break;
                     default:
                         break;
                 }
             }
         }
-        sb.append("\n").append(placeholder).append(CharKey.KEY_OBJECT_END);
+        sb.append("\n");
+        if (placeholder.length() <= 2) {
+            sb.append(placeholder);
+        } else {
+            sb.append(placeholder, 0, placeholder.length() - 2);
+        }
+        sb.append(CharKey.KEY_OBJECT_END);
         return sb.toString();
     }
 
@@ -103,7 +115,7 @@ public class TokenFormat {
         sb
                 .append(CharKey.KEY_ARRAY_BEGIN)
                 .append("\n")
-                .append(childPlaceholder);
+                .append(placeholder);
 
         if (tokenObject.getChildToken() != null) {
             for (TokenType child : tokenObject.getChildToken()) {
@@ -115,26 +127,29 @@ public class TokenFormat {
                         sb.append(" ").append(CharKey.KEY_SEP_COLON).append(" ");
                         break;
                     case TOKEN_SEP_COMMA:
-                        sb.append(CharKey.KEY_SEP_COMMA).append("\n").append(childPlaceholder);
+                        sb.append(CharKey.KEY_SEP_COMMA).append("\n").append(placeholder);
                         break;
                     case TOKEN_BOOL:
                         sb.append(child.getContent());
                         break;
+                    case TOKEN_NULL:
+                        sb.append("null");
+                        break;
                     case TOKEN_ARRAY:
-                        sb.append(formatTokenArray(child, childPlaceholder.concat(SPACE_KEY), deep + 1));
+                        sb.append(formatTokenArray(child, childPlaceholder, deep + 1));
                         break;
                     case TOKEN_NUMBER:
                         sb.append(child.getContent());
                         break;
                     case TOKEN_OBJECT:
-                        sb.append(formatTokenObject(child, childPlaceholder, deep + 1));
+                        sb.append(formatTokenObject(child, childPlaceholder, deep + 1, false));
                         break;
                     default:
                         break;
                 }
             }
         }
-        sb.append("\n").append(placeholder, 0, placeholder.length()-2).append(CharKey.KEY_ARRAY_END);
+        sb.append("\n").append(placeholder, 0, placeholder.length() - 2).append(CharKey.KEY_ARRAY_END);
         return sb.toString();
     }
 

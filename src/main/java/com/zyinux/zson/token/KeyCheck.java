@@ -47,6 +47,15 @@ public class KeyCheck {
     }
 
     /**
+     * 是不是一个 null
+     * @param value
+     * @return
+     */
+    public static boolean isNullKey(String value) {
+        return "null".equals(value);
+    }
+
+    /**
      * 是不是一个boolean类型的true
      * @param value
      * @return
