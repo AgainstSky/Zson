@@ -1,4 +1,4 @@
-package com.zyinux.zson.token.helper;
+package com.zyinux.zson.parser.token;
 
 import com.zyinux.zson.token.Token;
 import com.zyinux.zson.token.TokenType;
@@ -13,15 +13,16 @@ import java.util.Map;
  * @Desc
  * @date 2020/12/14
  */
-public class TokenTypeParser {
+public class MapTokenTypeParser implements TokenTypeParser<Map<String,Object>>{
 
-    public Map<String, Object> parserTokenTypeObjectToMap(TokenType tokenType) {
+    @Override
+    public Map<String, Object> parserTokenType(TokenType tokenObject) {
         Map<String, Object> result = new HashMap<>();
 
-        TokenType current=tokenType;
+        TokenType current=tokenObject;
         while (current!=null){
-            if (tokenType.getToken()== Token.TOKEN_STRING){
-                
+            if (current.getToken()== Token.TOKEN_STRING){
+
             }
         }
 
