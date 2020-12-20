@@ -1,5 +1,8 @@
 package com.zyinux.zson;
 
+import com.zyinux.zson.log.Log;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,11 +16,11 @@ public class Main {
 
     static String json="{\n" +
             "    \"ResultCode\": 200,\n" +
-            "    \"Message\": null,\n" +
+            "    \"Message\": \"\",\n" +
             "    \"CharSet\": \"utf-8\",\n" +
             "    \"Data\": {\n" +
             "        \"SellerReasonCnfs\": [\n" +
-            "            \"其它\",\n" +
+            "            123,\n" +
             "false,\n" +
             "123.453,\n" +
             "{\n" +
@@ -30,8 +33,11 @@ public class Main {
     public static void main(String[] args) {
         Zson zson=new Zson();
 
-        Map<String, Object> stringObjectMap = zson.parserJson(json);
-
-
+        Map<String, Object> map = zson.parserJson(json);
+        Map<String,Object> data = (Map<String, Object>) map.get("Data");
+        List list= (List) data.get("SellerReasonCnfs");
+        String s = (String) list.get(0);
+        s.equalsIgnoreCase()
+        Log.info(s);
     }
 }

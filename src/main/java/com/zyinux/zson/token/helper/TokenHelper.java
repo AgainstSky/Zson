@@ -17,14 +17,14 @@ import com.zyinux.zson.token.TokenType;
 public class TokenHelper {
 
     /**
-     * 预期解析出一个json对象
+     * 预期解析出一个json Object
      *
      * @param jsonReader
      * @return
      */
     public static TokenType parseForTokenObject(JsonReader jsonReader) {
 
-        TokenType tokenType = new TokenType(Token.TOKEN_OBJECT);
+        TokenType tokenType = TokenType.createForNeedChildToken(Token.TOKEN_OBJECT);
         boolean findNextKey = false;
         while (jsonReader.hasNext() && !findNextKey) {
             char next = jsonReader.next();
@@ -77,7 +77,7 @@ public class TokenHelper {
      * @return
      */
     private static TokenType parseForTokenArray(JsonReader jsonReader) {
-        TokenType tokenType = new TokenType(Token.TOKEN_ARRAY);
+        TokenType tokenType = TokenType.createForNeedChildToken(Token.TOKEN_ARRAY);
         boolean findNextKey = false;
 
         while (jsonReader.hasNext() && !findNextKey) {
