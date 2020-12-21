@@ -11,4 +11,6 @@ public interface ZsonConfig {
 
     boolean ignoreKeyCase();
 
+
+
 }

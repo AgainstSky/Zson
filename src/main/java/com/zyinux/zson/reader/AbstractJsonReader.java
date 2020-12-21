@@ -9,7 +9,7 @@ package com.zyinux.zson.reader;
  */
 public abstract class AbstractJsonReader<T> implements JsonReader {
 
-    protected int pos=0;
+    protected int pos = 0;
 
     protected String jsonStr;
 
@@ -26,7 +26,7 @@ public abstract class AbstractJsonReader<T> implements JsonReader {
 
     @Override
     public boolean hasNext() {
-        if (pos<jsonStr.length()){
+        if (pos < jsonStr.length()) {
             return true;
         }
         return false;

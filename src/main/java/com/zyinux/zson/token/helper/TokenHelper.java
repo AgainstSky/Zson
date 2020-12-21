@@ -5,7 +5,7 @@ import com.zyinux.zson.exception.ZsonException;
 import com.zyinux.zson.reader.JsonReader;
 import com.zyinux.zson.token.KeyCheck;
 import com.zyinux.zson.token.Token;
-import com.zyinux.zson.token.TokenType;
+import com.zyinux.zson.token.TokenTarget;
 
 /**
  * TokenHelper
@@ -22,9 +22,9 @@ public class TokenHelper {
      * @param jsonReader
      * @return
      */
-    public static TokenType parseForTokenObject(JsonReader jsonReader) {
+    public static TokenTarget parseForTokenObject(JsonReader jsonReader) {
 
-        TokenType tokenType = TokenType.createForNeedChildToken(Token.TOKEN_OBJECT);
+        TokenTarget tokenTarget = TokenTarget.createForNeedChildToken(Token.TOKEN_OBJECT);
         boolean findNextKey = false;
         while (jsonReader.hasNext() && !findNextKey) {
             char next = jsonReader.next();
@@ -34,13 +34,13 @@ public class TokenHelper {
             }
             switch (next) {
                 case CharKey.KEY_OBJECT_BEGIN:
-                    tokenType.add(parseForTokenObject(jsonReader));
+                    tokenTarget.add(parseForTokenObject(jsonReader));
                     break;
                 case CharKey.KEY_OBJECT_END:
                     findNextKey = true;
                     break;
                 case CharKey.KEY_ARRAY_BEGIN:
-                    tokenType.add(parseForTokenArray(jsonReader));
+                    tokenTarget.add(parseForTokenArray(jsonReader));
                     break;
                 case CharKey.KEY_ARRAY_END:
                     //理论上这个key应该在 parseForTokenArray 里被处理，不会在解析Object里出现
@@ -51,14 +51,14 @@ public class TokenHelper {
                     //tokenType.add(new TokenType(Token.TOKEN_ESCAPE));
                     break;
                 case CharKey.KEY_SEP_COMMA:
-                    tokenType.add(new TokenType(Token.TOKEN_SEP_COMMA));
+                    tokenTarget.add(new TokenTarget(Token.TOKEN_SEP_COMMA));
                     break;
                 case CharKey.KEY_SEP_COLON:
-                    tokenType.add(new TokenType(Token.TOKEN_SEP_COLON));
-                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
+                    tokenTarget.add(new TokenTarget(Token.TOKEN_SEP_COLON));
+                    tokenTarget.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
                     break;
                 case CharKey.KEY_KEY:
-                    tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
+                    tokenTarget.add(TokenHelper.findTheTokenStringData(jsonReader));
                     break;
                 default:
                     break;
@@ -68,7 +68,7 @@ public class TokenHelper {
         if (!findNextKey){
             throw new ZsonException("解析错误，直到结束所有流，也没有遇到预期的 ` } ` 来结束这个json对象 ");
         }
-        return tokenType;
+        return tokenTarget;
     }
 
     /**
@@ -76,8 +76,8 @@ public class TokenHelper {
      * @param jsonReader
      * @return
      */
-    private static TokenType parseForTokenArray(JsonReader jsonReader) {
-        TokenType tokenType = TokenType.createForNeedChildToken(Token.TOKEN_ARRAY);
+    private static TokenTarget parseForTokenArray(JsonReader jsonReader) {
+        TokenTarget tokenTarget = TokenTarget.createForNeedChildToken(Token.TOKEN_ARRAY);
         boolean findNextKey = false;
 
         while (jsonReader.hasNext() && !findNextKey) {
@@ -88,12 +88,12 @@ public class TokenHelper {
             }
             switch (next) {
                 case CharKey.KEY_OBJECT_BEGIN:
-                    tokenType.add(parseForTokenObject(jsonReader));
+                    tokenTarget.add(parseForTokenObject(jsonReader));
                     break;
                 case CharKey.KEY_OBJECT_END:
                     break;
                 case CharKey.KEY_ARRAY_BEGIN:
-                    tokenType.add(parseForTokenArray(jsonReader));
+                    tokenTarget.add(parseForTokenArray(jsonReader));
                     break;
                 case CharKey.KEY_ARRAY_END:
                     findNextKey = true;
@@ -103,8 +103,8 @@ public class TokenHelper {
                     //tokenType.add(new TokenType(Token.TOKEN_ESCAPE));
                     break;
                 case CharKey.KEY_SEP_COMMA:
-                    tokenType.add(new TokenType(Token.TOKEN_SEP_COMMA));
-                    tokenType.add(getTheTokenMaybeValue(jsonReader));
+                    tokenTarget.add(new TokenTarget(Token.TOKEN_SEP_COMMA));
+                    tokenTarget.add(getTheTokenMaybeValue(jsonReader));
                     break;
                 case CharKey.KEY_SEP_COLON:
                     //理论上来说数组里面无论如何都不能存在这个key，这个只能被包括在内部的object里，所以应该抛出异常
@@ -113,11 +113,11 @@ public class TokenHelper {
 //                    tokenType.add(TokenHelper.getTheTokenMaybeValue(jsonReader));
 //                    break;
                 case CharKey.KEY_KEY:
-                    tokenType.add(TokenHelper.findTheTokenStringData(jsonReader));
+                    tokenTarget.add(TokenHelper.findTheTokenStringData(jsonReader));
                     break;
                 default:
                     jsonReader.backOne();
-                    tokenType.add(getTheTokenMaybeValue(jsonReader));
+                    tokenTarget.add(getTheTokenMaybeValue(jsonReader));
                     break;
             }
 
@@ -125,7 +125,7 @@ public class TokenHelper {
         if (!findNextKey){
             throw new ZsonException("解析错误，直到结束所有流，也没有遇到预期的 ` ] ` 来结束这个json对象 ");
         }
-        return tokenType;
+        return tokenTarget;
     }
 
     /**
@@ -134,7 +134,7 @@ public class TokenHelper {
      * @param jsonReader
      * @return
      */
-    public static TokenType findTheTokenStringData(JsonReader jsonReader) {
+    public static TokenTarget findTheTokenStringData(JsonReader jsonReader) {
         StringBuffer sb = new StringBuffer();
         char next = ' ';
 
@@ -156,7 +156,7 @@ public class TokenHelper {
         if (next != CharKey.KEY_KEY) {
             throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期有一个'" + CharKey.KEY_KEY + "'，但是不存在");
         }
-        return new TokenType(Token.TOKEN_STRING, sb.toString());
+        return new TokenTarget(Token.TOKEN_STRING, sb.toString());
     }
 
     /**
@@ -167,7 +167,7 @@ public class TokenHelper {
      * @param jsonReader
      * @return
      */
-    public static TokenType getTheTokenMaybeValue(JsonReader jsonReader) {
+    public static TokenTarget getTheTokenMaybeValue(JsonReader jsonReader) {
         if (!jsonReader.hasNext()) {
             throw new ZsonException("解析错误，在第" + jsonReader.position() + "处预期不能结尾，但是json结束了");
         }
@@ -183,7 +183,7 @@ public class TokenHelper {
             } else if (next == CharKey.KEY_ARRAY_BEGIN) {
                 return parseForTokenArray(jsonReader);
             } else if (next == CharKey.KEY_ARRAY_END){
-                return new TokenType(Token.TOKEN_ARRAY_END);
+                return new TokenTarget(Token.TOKEN_ARRAY_END);
             }if (next == CharKey.KEY_KEY) {
                 return findTheTokenStringData(jsonReader);
             } else if (next == 'f' || next == 't') {
@@ -206,7 +206,7 @@ public class TokenHelper {
      * @param prev
      * @return
      */
-    private static TokenType findTheTokenNullData(JsonReader jsonReader, char prev) {
+    private static TokenTarget findTheTokenNullData(JsonReader jsonReader, char prev) {
         StringBuilder sb = new StringBuilder();
         sb.append(prev);
         while (jsonReader.hasNext()) {
@@ -217,19 +217,19 @@ public class TokenHelper {
             sb.append(next);
         }
         String value = sb.toString().trim();
-        TokenType tokenType = new TokenType(Token.TOKEN_NULL);
+        TokenTarget tokenTarget = new TokenTarget(Token.TOKEN_NULL);
         if (KeyCheck.isNullKey(value)) {
-            tokenType.setContent("null");
+            tokenTarget.setContent("null");
         } else {
             throw new ZsonException("解析错误，在" + jsonReader.position() + "处理应是一个 null ，然而是：" + value);
         }
 
         // 回退一位
         jsonReader.backOne();
-        return tokenType;
+        return tokenTarget;
     }
 
-    private static TokenType findTheTokenNumberData(JsonReader jsonReader, char prev) {
+    private static TokenTarget findTheTokenNumberData(JsonReader jsonReader, char prev) {
         StringBuilder sb = new StringBuilder();
         sb.append(prev);
         while (jsonReader.hasNext()) {
@@ -243,13 +243,13 @@ public class TokenHelper {
             sb.append(next);
         }
         String value = sb.toString().trim();
-        TokenType tokenType = new TokenType(Token.TOKEN_NUMBER);
-        tokenType.setContent(value);
+        TokenTarget tokenTarget = new TokenTarget(Token.TOKEN_NUMBER);
+        tokenTarget.setContent(value);
         jsonReader.backOne();
-        return tokenType;
+        return tokenTarget;
     }
 
-    private static TokenType findTheTokenBooleanData(JsonReader jsonReader, char prev) {
+    private static TokenTarget findTheTokenBooleanData(JsonReader jsonReader, char prev) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(prev);
@@ -261,17 +261,17 @@ public class TokenHelper {
             sb.append(next);
         }
         String value = sb.toString().trim();
-        TokenType tokenType = new TokenType(Token.TOKEN_BOOL);
+        TokenTarget tokenTarget = new TokenTarget(Token.TOKEN_BOOL);
         if (KeyCheck.isFalseKey(value)) {
-            tokenType.setContent(false);
+            tokenTarget.setContent(false);
         } else if (KeyCheck.isTrueKey(value)) {
-            tokenType.setContent(true);
+            tokenTarget.setContent(true);
         } else {
             throw new ZsonException("解析错误，在" + jsonReader.position() + "处理应是一个boolean类型，然而是：" + value);
         }
 
         // 回退一位
         jsonReader.backOne();
-        return tokenType;
+        return tokenTarget;
     }
 }

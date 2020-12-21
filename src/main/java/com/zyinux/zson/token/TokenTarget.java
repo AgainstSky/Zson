@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,15 +15,15 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class TokenType {
+public class TokenTarget {
 
     /**
      * 创建初始化了childToken的TokenType，只有Object和Array需要
      * @param token
      * @return
      */
-    public static TokenType createForNeedChildToken(Token token){
-        TokenType t=new TokenType(token);
+    public static TokenTarget createForNeedChildToken(Token token){
+        TokenTarget t=new TokenTarget(token);
         t.setChildToken(new ArrayList<>());
         return t;
     }
@@ -34,27 +33,27 @@ public class TokenType {
     /**
      * 理论上来说，只有TokenObject和TokenArray里才需要
      */
-    List<TokenType> childToken;
+    List<TokenTarget> childToken;
 
     Object content;
 
-    public TokenType(Token token) {
+    public TokenTarget(Token token) {
         this.token = token;
     }
 
 
 
-    public TokenType(Token token, Object content) {
+    public TokenTarget(Token token, Object content) {
         this.token = token;
         this.content = content;
     }
 
-    public TokenType() {
+    public TokenTarget() {
 
     }
 
-    public void add(TokenType tokenType) {
-        childToken.add(tokenType);
+    public void add(TokenTarget tokenTarget) {
+        childToken.add(tokenTarget);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.zyinux.zson.parser.json;
 
-import com.zyinux.zson.token.TokenType;
+import com.zyinux.zson.token.TokenTarget;
 
 /**
  * JsonParser
@@ -16,5 +16,5 @@ public interface JsonParser {
      * @param json
      * @return
      */
-    TokenType parser(String json);
+    TokenTarget parser(String json);
 }

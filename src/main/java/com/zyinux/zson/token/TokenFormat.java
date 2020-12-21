@@ -17,22 +17,22 @@ public class TokenFormat {
     /**
      * 测试情况下的输出辅助，方便看清楚数据，不是正常情况下的格式化json
      *
-     * @param tokenType
+     * @param tokenTarget
      * @return
      */
-    public String formatForDebug(TokenType tokenType) {
+    public String formatForDebug(TokenTarget tokenTarget) {
         StringBuilder sb = new StringBuilder();
-        if (isObjectStyleToken(tokenType)) {
+        if (isObjectStyleToken(tokenTarget)) {
             sb.append("{\n");
-            for (TokenType type : tokenType.getChildToken()) {
+            for (TokenTarget type : tokenTarget.getChildToken()) {
                 sb.append(formatForDebug(type));
             }
             sb.append("}\n");
         } else {
-            if (tokenType.getContent() == null) {
-                sb.append(tokenType.getToken().getKey()).append("\n");
+            if (tokenTarget.getContent() == null) {
+                sb.append(tokenTarget.getToken().getKey()).append("\n");
             } else {
-                sb.append(tokenType.getToken()).append("@ ").append(tokenType.getContent()).append("\n");
+                sb.append(tokenTarget.getToken()).append("@ ").append(tokenTarget.getContent()).append("\n");
             }
 
         }
@@ -40,8 +40,8 @@ public class TokenFormat {
         return sb.toString();
     }
 
-    public String format(TokenType tokenType) {
-        return formatTokenObject(tokenType, "", 0, false);
+    public String format(TokenTarget tokenTarget) {
+        return formatTokenObject(tokenTarget, "", 0, false);
     }
 
     /**
@@ -51,7 +51,7 @@ public class TokenFormat {
      * @param deep        当前解析的对象深度
      * @return
      */
-    private String formatTokenObject(TokenType tokenObject, String placeholder, int deep, boolean needBreak) {
+    private String formatTokenObject(TokenTarget tokenObject, String placeholder, int deep, boolean needBreak) {
         StringBuilder sb = new StringBuilder();
 
         String childPlaceholder = buildChildDeepSpace(placeholder);
@@ -66,7 +66,7 @@ public class TokenFormat {
                 .append(placeholder);
 
         if (tokenObject.getChildToken() != null) {
-            for (TokenType child : tokenObject.getChildToken()) {
+            for (TokenTarget child : tokenObject.getChildToken()) {
                 switch (child.getToken()) {
                     case TOKEN_STRING:
                         sb.append(CharKey.KEY_KEY).append(child.getContent()).append(CharKey.KEY_KEY);
@@ -107,7 +107,7 @@ public class TokenFormat {
         return sb.toString();
     }
 
-    private String formatTokenArray(TokenType tokenObject, String placeholder, int deep) {
+    private String formatTokenArray(TokenTarget tokenObject, String placeholder, int deep) {
         StringBuilder sb = new StringBuilder();
 
         String childPlaceholder = buildChildDeepSpace(placeholder);
@@ -118,7 +118,7 @@ public class TokenFormat {
                 .append(placeholder);
 
         if (tokenObject.getChildToken() != null) {
-            for (TokenType child : tokenObject.getChildToken()) {
+            for (TokenTarget child : tokenObject.getChildToken()) {
                 switch (child.getToken()) {
                     case TOKEN_STRING:
                         sb.append(CharKey.KEY_KEY).append(child.getContent()).append(CharKey.KEY_KEY);
@@ -165,8 +165,8 @@ public class TokenFormat {
         return sb.toString();
     }
 
-    public boolean isObjectStyleToken(TokenType tokenType) {
-        Token token = tokenType.getToken();
+    public boolean isObjectStyleToken(TokenTarget tokenTarget) {
+        Token token = tokenTarget.getToken();
         return token == Token.TOKEN_OBJECT
                 || token == Token.TOKEN_ARRAY;
     }

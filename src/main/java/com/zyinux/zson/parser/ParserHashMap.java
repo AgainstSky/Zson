@@ -5,10 +5,8 @@ import com.zyinux.zson.parser.json.JsonParser;
 import com.zyinux.zson.parser.json.SimpleJsonParser;
 import com.zyinux.zson.parser.token.MapTokenTypeParser;
 import com.zyinux.zson.parser.token.TokenTypeParser;
-import com.zyinux.zson.reader.JsonReader;
-import com.zyinux.zson.reader.StringJsonReader;
 import com.zyinux.zson.token.TokenFormat;
-import com.zyinux.zson.token.TokenType;
+import com.zyinux.zson.token.TokenTarget;
 
 import java.util.*;
 
@@ -21,33 +19,18 @@ import java.util.*;
  */
 public class ParserHashMap {
 
-    private Stack<Character> keyStack = new Stack<Character>();
-
     JsonParser jsonParser=new SimpleJsonParser();
 
     TokenTypeParser<Map<String,Object>> tokenParser= new MapTokenTypeParser();
 
     public Map<String, Object> parser(String json) {
-        TokenType tokenType = jsonParser.parser(json);
+        TokenTarget tokenTarget = jsonParser.parser(json);
         TokenFormat format=new TokenFormat();
 
 
-        String fs = format.format(tokenType);
+        String fs = format.format(tokenTarget);
         Log.debug(fs);
 
-        return tokenParser.parserTokenType(tokenType);
+        return tokenParser.parserTokenType(tokenTarget);
     }
-
-
-    private Queue<TokenType> parserJsonToTokenTypeList(String json) {
-        Queue<TokenType> queue = new ArrayDeque<>();
-        JsonReader jsonReader = new StringJsonReader(json);
-
-        StringBuffer sb = new StringBuffer();
-
-
-        return queue;
-    }
-
-
 }

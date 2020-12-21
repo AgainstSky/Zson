@@ -1,6 +1,6 @@
 package com.zyinux.zson.parser.token;
 
-import com.zyinux.zson.token.TokenType;
+import com.zyinux.zson.token.TokenTarget;
 
 /**
  * TokenTypeParser
@@ -15,5 +15,5 @@ public interface TokenTypeParser<T> {
      * 将TokenType解析
      * @return
      */
-    T parserTokenType(TokenType tokenObject);
+    T parserTokenType(TokenTarget tokenObject);
 }

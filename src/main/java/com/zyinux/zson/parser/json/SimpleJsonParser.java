@@ -2,11 +2,11 @@ package com.zyinux.zson.parser.json;
 
 import com.zyinux.zson.CharKey;
 import com.zyinux.zson.exception.ZsonException;
-import com.zyinux.zson.parser.json.JsonParser;
+import com.zyinux.zson.reader.FastStringJsonReader;
 import com.zyinux.zson.reader.JsonReader;
 import com.zyinux.zson.reader.StringJsonReader;
 import com.zyinux.zson.token.KeyCheck;
-import com.zyinux.zson.token.TokenType;
+import com.zyinux.zson.token.TokenTarget;
 import com.zyinux.zson.token.helper.TokenHelper;
 
 /**
@@ -20,13 +20,13 @@ public class SimpleJsonParser implements JsonParser {
 
 
     @Override
-    public TokenType parser(String json) {
-        TokenType tokenType = parserJsonToTokenObject(json);
+    public TokenTarget parser(String json) {
+        TokenTarget tokenTarget = parserJsonToTokenObject(json);
 //        return parser.parserTokenTypeObjectToMap(tokenType);
-        return tokenType;
+        return tokenTarget;
     }
 
-    private TokenType parserJsonToTokenObject(String json) {
+    private TokenTarget parserJsonToTokenObject(String json) {
         JsonReader jsonReader = new StringJsonReader(json);
 
         //先跳过第一个对象开始符前的所有空格字符
@@ -38,7 +38,7 @@ public class SimpleJsonParser implements JsonParser {
         }
 
         //解析
-        TokenType tokenType = TokenHelper.parseForTokenObject(jsonReader);
+        TokenTarget tokenTarget = TokenHelper.parseForTokenObject(jsonReader);
 
         //一个json最外层一定就是一个对象，解析完成之后不应该还有除了空格以外的字符在后面
         while (jsonReader.hasNext()) {
@@ -46,6 +46,6 @@ public class SimpleJsonParser implements JsonParser {
                 throw new ZsonException("解析错误，在解析完成之后还存在未知字符.");
             }
         }
-        return tokenType;
+        return tokenTarget;
     }
 }
